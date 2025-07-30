@@ -1,0 +1,128 @@
+name: Publish
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - run: pip install uv
+
+    - name: Install PyTorch
+      run: |
+        uv venv
+        uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+    - name: Extract PyTorch & deps
+      run: |
+        mkdir torch_x86_64-linux
+        move ".venv\Lib\site-packages\filelock" ^
+        ".venv\Lib\site-packages\fsspec" ^
+        ".venv\Lib\site-packages\jinja2" ^
+        ".venv\Lib\site-packages\markupsafe" ^
+        ".venv\Lib\site-packages\mpmath" ^
+        ".venv\Lib\site-packages\networkx" ^
+        ".venv\Lib\site-packages\sympy" ^
+        ".venv\Lib\site-packages\torch" ^
+        ".venv\Lib\site-packages\torchgen" ^
+        ".venv\Lib\site-packages\typing_extensions.py" ^
+        "torch_x86_64-linux\"
+    
+    - name: Compress archive
+      shell: bash
+      run: tar cf - torch_x86_64-windows | xz -9 > torch_x86_64-windows.tar.xz
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: x86_64-windows
+        path: torch_x86_64-windows.tar.xz
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - run: pip install uv
+
+    - name: Install PyTorch
+      run: |
+        uv venv
+        uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+    - name: Extract PyTorch & deps
+      run: |
+        mkdir torch_x86_64-linux
+        mv .venv/lib/python3.12/site-packages/filelock/ \
+        .venv/lib/python3.12/site-packages/fsspec/ \
+        .venv/lib/python3.12/site-packages/jinja2/ \
+        .venv/lib/python3.12/site-packages/markupsafe/ \
+        .venv/lib/python3.12/site-packages/mpmath/ \
+        .venv/lib/python3.12/site-packages/networkx/ \
+        .venv/lib/python3.12/site-packages/sympy/ \
+        .venv/lib/python3.12/site-packages/torch/ \
+        .venv/lib/python3.12/site-packages/torchgen/ \
+        .venv/lib/python3.12/site-packages/typing_extensions.py \
+        ./torch_x86_64-linux/
+      
+    - name: Compress archive
+      run: tar cf - torch_x86_64-linux | xz -9 > torch_x86_64-linux.tar.xz
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: x86_64-linux
+        path: torch_x86_64-linux.tar.xz
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: "startsWith(github.ref, 'refs/tags/')"
+    needs: [build-linux, build-windows]
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Determine next tag
+        id: get_tag
+        run: |
+          git fetch --tags
+
+          # Get the latest tag in the format r-N
+          latest_tag=$(git tag | grep -E '^r-[0-9]+$' | sort -V | tail -n 1)
+
+          # Extract the numeric part N from r-N
+          if [[ $latest_tag =~ ^r-([0-9]+)$ ]]; then
+            latest_number=${BASH_REMATCH[1]}
+          else
+            latest_number=0
+          fi
+
+          new_number=$((latest_number + 1))
+          new_tag="r-${new_number}"
+
+          echo "Latest tag: $latest_tag"
+          echo "New tag: $new_tag"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_tag.outputs.new_tag }}
+          files: ./torch_*
+          body: "Platform-specific PyTorch files"
