@@ -24,16 +24,16 @@ jobs:
     - name: Extract PyTorch & deps
       run: |
         mkdir torch_x86_64-linux
-        move ".venv\Lib\site-packages\filelock" ^
-        ".venv\Lib\site-packages\fsspec" ^
-        ".venv\Lib\site-packages\jinja2" ^
-        ".venv\Lib\site-packages\markupsafe" ^
-        ".venv\Lib\site-packages\mpmath" ^
-        ".venv\Lib\site-packages\networkx" ^
-        ".venv\Lib\site-packages\sympy" ^
-        ".venv\Lib\site-packages\torch" ^
-        ".venv\Lib\site-packages\torchgen" ^
-        ".venv\Lib\site-packages\typing_extensions.py" ^
+        move ".venv\Lib\site-packages\filelock" `
+        ".venv\Lib\site-packages\fsspec" `
+        ".venv\Lib\site-packages\jinja2" `
+        ".venv\Lib\site-packages\markupsafe" `
+        ".venv\Lib\site-packages\mpmath" `
+        ".venv\Lib\site-packages\networkx" `
+        ".venv\Lib\site-packages\sympy" `
+        ".venv\Lib\site-packages\torch" `
+        ".venv\Lib\site-packages\torchgen" `
+        ".venv\Lib\site-packages\typing_extensions.py" `
         "torch_x86_64-linux\"
     
     - name: Compress archive
