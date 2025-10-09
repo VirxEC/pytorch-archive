@@ -34,20 +34,18 @@ jobs:
         uv pip install torch --index-url https://download.pytorch.org/whl/cpu
 
     - name: Extract PyTorch & deps
-      shell: bash
       run: |
         mkdir torch-archive
-        mv .venv/lib/python3.12/site-packages/filelock/ \
-        .venv/lib/python3.12/site-packages/fsspec/ \
-        .venv/lib/python3.12/site-packages/jinja2/ \
-        .venv/lib/python3.12/site-packages/markupsafe/ \
-        .venv/lib/python3.12/site-packages/mpmath/ \
-        .venv/lib/python3.12/site-packages/networkx/ \
-        .venv/lib/python3.12/site-packages/sympy/ \
-        .venv/lib/python3.12/site-packages/torch/ \
-        .venv/lib/python3.12/site-packages/torchgen/ \
-        .venv/lib/python3.12/site-packages/typing_extensions.py \
-        ./torch-archive/
+        move ".venv\Lib\site-packages\filelock" "torch-archive\"
+        move ".venv\Lib\site-packages\fsspec" "torch-archive\"
+        move ".venv\Lib\site-packages\jinja2" "torch-archive\"
+        move ".venv\Lib\site-packages\markupsafe" "torch-archive\"
+        move ".venv\Lib\site-packages\mpmath" "torch-archive\"
+        move ".venv\Lib\site-packages\networkx" "torch-archive\"
+        move ".venv\Lib\site-packages\sympy" "torch-archive\"
+        move ".venv\Lib\site-packages\torch" "torch-archive\"
+        move ".venv\Lib\site-packages\torchgen" "torch-archive\"
+        move ".venv\Lib\site-packages\typing_extensions.py" "torch-archive\"
 
     - name: Download bob
       if: ${{ steps.download_packs.outcome == 'success' }}
