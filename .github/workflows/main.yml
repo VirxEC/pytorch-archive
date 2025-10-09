@@ -58,11 +58,12 @@ jobs:
 
     - name: Generate platform diff
       if: ${{ steps.download_packs.outcome == 'success' }}
+      shell: cmd
       run: bob.exe diff torch-archive-old torch-archive > patch_x86_64-windows.bobdiff
 
     - name: Compress archive
       shell: bash
-      run: tar cf - torch | xz -9 > botpack_x86_64-windows.tar.xz
+      run: tar cf - torch-archive | xz -9 > botpack_x86_64-windows.tar.xz
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
