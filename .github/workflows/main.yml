@@ -36,7 +36,7 @@ jobs:
 
     - name: Compress archive
       shell: bash
-      run: tar cf - torch_x86_64-windows | xz > torch_x86_64-windows.tar.xz
+      run: tar cf - torch_x86_64-windows | xz -9 > botpack_x86_64-windows.tar.xz
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
@@ -75,7 +75,7 @@ jobs:
         ./torch_x86_64-linux/
 
     - name: Compress archive
-      run: tar cf - torch_x86_64-linux | xz > torch_x86_64-linux.tar.xz
+      run: tar cf - torch_x86_64-linux | xz -9 > botpack_x86_64-linux.tar.xz
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
@@ -123,5 +123,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_tag.outputs.new_tag }}
-          files: ./torch_*
+          files: ./botpack_*
           body: "Platform-specific PyTorch files"
