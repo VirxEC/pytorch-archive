@@ -31,7 +31,7 @@ jobs:
       run: |
         pip install uv
         uv venv
-        uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+        uv pip install torch==2.4.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
     - name: Extract PyTorch & deps
       run: |
@@ -99,7 +99,7 @@ jobs:
       run: |
         pip install uv
         uv venv
-        uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+        uv pip install torch==2.4.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
     - name: Extract PyTorch & deps
       run: |
